@@ -15,6 +15,6 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "cs-crosshair-finder"
           heroku_email: "emmanuelvlad@gmail.com"
-          buildpack: "heroku/go"
+          branch: "main"
         env:
           FACEIT_API_KEY: ${{secrets.FACEIT_API_KEY}}
