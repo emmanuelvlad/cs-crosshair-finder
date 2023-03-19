@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	dem "github.com/markus-wa/demoinfocs-golang/v2/pkg/demoinfocs"
@@ -55,6 +56,9 @@ func requestFaceIt(endpoint string) ([]byte, error) {
 	bearer := "Bearer " + os.Getenv("FACEIT_API_KEY")
 
 	req, err := http.NewRequest("GET", "https://open.faceit.com/data/v4"+endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("Authorization", bearer)
 	req.Header.Add("Accept", "application/json")
 
@@ -79,11 +83,15 @@ func getPlayer(steamID string) (Player, error) {
 		return player, errors.New(player.Errors[0].Message)
 	}
 
-	playerHistoryResponse, err := requestFaceIt("/players/" + player.PlayerID + "/history?game=csgo&offset=0&limit=20")
+	now := time.Now()
+	then := now.AddDate(0, -6, 0)
+
+	playerHistoryResponse, err := requestFaceIt("/players/" + player.PlayerID + "/history?game=csgo&offset=0&limit=20&from=" + fmt.Sprint(then.Unix()))
 	if err != nil {
 		return Player{}, err
 	}
 	json.Unmarshal(playerHistoryResponse, &player)
+
 	if len(player.Errors) > 0 {
 		return player, errors.New(player.Errors[0].Message)
 	}
